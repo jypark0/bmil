@@ -1,0 +1,8 @@
+wandb:
+  _target_: src.logger.WandBLogger
+  entity: null
+  dir: "."
+  project: ???
+  name: null
+  tags: null
+  id: null # pass wandb id to resume

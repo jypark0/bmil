@@ -1,0 +1,63 @@
+batch_size: 200
+
+train:
+  n_epoch: 0
+  step_per_epoch: 200
+  step_per_collect: ${.step_per_epoch}
+  update_per_collect: 1
+  exploration_noise: true
+
+net_a:
+  _target_: tianshou.utils.net.common.Net
+  hidden_sizes: [256, 256, 256]
+  device: ${device}
+
+actor:
+  _target_: tianshou.utils.net.continuous.ActorProb
+  unbounded: true
+  conditioned_sigma: true
+  device: ${device}
+
+actor_optimizer:
+  _target_: torch.optim.Adam
+  lr: 1e-3
+
+net_c1:
+  _target_: tianshou.utils.net.common.Net
+  hidden_sizes: [256, 256, 256]
+  concat: true
+  device: ${device}
+
+critic1:
+  _target_: tianshou.utils.net.continuous.Critic
+  device: ${device}
+
+critic1_optimizer:
+  _target_: torch.optim.Adam
+  lr: 1e-3
+
+net_c2:
+  _target_: tianshou.utils.net.common.Net
+  hidden_sizes: [256, 256, 256]
+  concat: true
+  device: ${device}
+
+critic2:
+  _target_: tianshou.utils.net.continuous.Critic
+  device: ${device}
+
+critic2_optimizer:
+  _target_: torch.optim.Adam
+  lr: 1e-3
+
+auto_alpha:
+  "on": true
+  alpha: 0.2
+  lr: 5e-4
+
+sac:
+  tau: 0.005
+  gamma: 0.995
+  reward_normalization: false
+  estimation_step: 1
+  deterministic_eval: true

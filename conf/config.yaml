@@ -1,0 +1,10 @@
+# Get original working directory
+work_dir: ${hydra:runtime.cwd}
+
+seed: 1
+device: cuda
+
+defaults:
+  - _self_
+  - logger: default
+  - policy: bc

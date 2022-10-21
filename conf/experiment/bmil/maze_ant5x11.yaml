@@ -1,0 +1,79 @@
+ @package _global_
+
+name: BMIL_${env.agent}5x11
+method: bmil
+seed: 1
+
+logger:
+  wandb:
+    project: Maze
+    name: ${name}
+
+env:
+  agent: Ant
+  id: ${.agent}WallRoom5x11-v0
+  init: &env_defaults {}
+  wrappers: []
+
+test:
+  n_envs: 20
+  n_ep: 100
+  env:
+    _target_: tianshou.env.DummyVectorEnv
+    norm_obs: false
+  collector:
+    _target_: src.data.collector.TqdmPosCollector
+
+eval:
+  n_envs: 20
+  n_ep: 100
+  env:
+    _target_: tianshou.env.ShmemVectorEnv
+    norm_obs: ${test.env.norm_obs}
+  env_kwargs:
+    <<: *env_defaults
+    reset_noise_scale: 0.1
+  collector:
+    _target_: src.data.collector.TqdmPosCollector
+
+policy:
+  batch_size: 256
+  train:
+    n_epoch: 400
+    step_per_epoch: 500
+  bc:
+    demo_ratio: 0.9
+
+dynamics:
+  model:
+    bounded_act: true
+    bounded_obs: true
+    predict_reward: false
+    zero_reward: false
+    update_method: converge
+  n_updates: null
+
+trace:
+  samples_per_start: 1
+  size_schedule:
+    - 1
+    - 10
+  epoch_schedule:
+    - 100
+    - ${policy.train.n_epoch}
+  noise_method:
+    mode: entropy
+    max_t: 1
+    scale_coef: 10
+
+demonstration:
+  n_ep: 20
+  path: ${work_dir}/data/demos/maze/Goal${env.agent}WallRoom5x11-v1/${.n_ep}episodes.pkl
+  repeat: 1
+  buffer:
+    _target_: tianshou.data.ReplayBuffer
+    size: 1000000
+
+defaults:
+  - /dynamics: backward
+  - override /policy: bmil

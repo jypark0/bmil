@@ -1,0 +1,67 @@
+value_batch_size: 64
+model_batch_size: 128
+
+value_train:
+  n_epoch: 0
+
+model_train:
+  n_epoch: 0
+
+rl_train:
+  n_epoch: 0
+  step_per_epoch: 1000
+  step_per_collect: ${.step_per_epoch}
+  value_update_per_collect: 1
+  model_update_per_collect: 1
+
+perturb:
+  _target_: src.policy.vins.FetchPerturb
+  mode: "arm_gripper"
+
+value_net:
+  _target_: tianshou.utils.net.common.Net
+  hidden_sizes: [256, 256]
+  device: ${device}
+
+value_optimizer:
+  _target_: torch.optim.Adam
+  lr: 3e-4
+
+value_model:
+  _target_: tianshou.utils.net.continuous.Critic
+  device: ${device}
+
+value_function:
+  _target_: src.policy.vins.ValueFunction
+  tau: 0.0005
+  gamma: 1
+  n_interpolations: 6
+  n_perturb: 2
+  ns_coef: 20
+  perturb_type: reduced
+  device: ${device}
+
+dynamics_net:
+  _target_: tianshou.utils.net.common.Net
+  hidden_sizes: [500, 500]
+  concat: True
+  device: ${device}
+
+dynamics_optimizer:
+  _target_: torch.optim.Adam
+  lr: 3e-3
+  weight_decay: 1e-5
+
+dynamics_model:
+  _target_: src.policy.vins.DynamicsModel
+  max_grad_norm: 2
+  device: ${device}
+
+imitator:
+  _target_: src.policy.vins.Imitator
+  k: 500
+  vins_alpha: 0.1
+  rl_alpha: 1
+  action_scaling: False
+  action_bound_method: "clip"
+  device: ${device}

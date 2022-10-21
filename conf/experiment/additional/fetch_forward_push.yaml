@@ -1,0 +1,80 @@
+# @package _global_
+
+name: BMIL_ForwardModel_push
+method: bmil
+seed: 1
+
+logger:
+  wandb:
+    project: Fetch_ForwardModel
+    name: ${name}
+
+env:
+  id: Push-v2
+  init: &env_defaults
+    random_gripper: false
+    random_object: false
+    random_goal: false
+    terminate_on_success: false
+  wrappers:
+    - src.envs.wrappers.ObservationWrapper: {}
+
+test:
+  n_envs: 20
+  n_ep: 1000
+  env:
+    _target_: tianshou.env.DummyVectorEnv
+    norm_obs: false
+  collector:
+    _target_: src.data.collector.TqdmPosCollector
+
+eval:
+  n_envs: 20
+  n_ep: 10000
+  env:
+    _target_: tianshou.env.ShmemVectorEnv
+    norm_obs: ${test.env.norm_obs}
+  env_kwargs:
+    <<: *env_defaults
+    random_gripper: true
+  collector:
+    _target_: src.data.collector.TqdmPosCollector
+
+policy:
+  batch_size: 64
+  train:
+    n_epoch: 200
+    step_per_epoch: 100
+  bc:
+    demo_ratio: 0.5
+
+dynamics:
+  model:
+    bounded_obs: false
+    update_method: converge
+  n_updates: null
+
+trace:
+  samples_per_start: 1
+  size_schedule:
+    - 1
+    - 1
+  epoch_schedule:
+    - 1
+    - ${policy.train.n_epoch}
+  noise_method:
+    mode: entropy
+    max_t: 1
+    scale_coef: 3
+
+demonstration:
+  n_ep: 5
+  path: ${work_dir}/data/demos/fetch/${env.id}/${.n_ep}episodes.pkl
+  repeat: 10
+  buffer:
+    _target_: tianshou.data.ReplayBuffer
+    size: 100000
+
+defaults:
+  - /dynamics: forward
+  - override /policy: bmil

@@ -1,0 +1,57 @@
+# @package _global_
+
+name: SACExpert
+
+seed: 42
+
+logger:
+  wandb:
+    project: SACExpert
+    name: ${name}
+
+env:
+  id: GoalPointRegionUMaze-v2
+  init: {}
+  wrappers:
+    - gym.wrappers.FlattenObservation: {}
+
+train:
+  n_envs: 1
+  buffer:
+    _target_: tianshou.data.VectorReplayBuffer
+    total_size: 1000000
+    buffer_num: ${train.n_envs}
+  env:
+    _target_: tianshou.env.DummyVectorEnv
+    norm_obs: false
+  collector:
+    _target_: tianshou.data.Collector
+    exploration_noise: ${policy.train.exploration_noise}
+
+test:
+  epoch_frequency: 1
+  n_envs: 5
+  n_ep: 5
+  env:
+    _target_: tianshou.env.DummyVectorEnv
+    norm_obs: ${train.env.norm_obs}
+  collector:
+    _target_: tianshou.data.Collector
+
+policy:
+  batch_size: 256
+  train:
+    n_epoch: 5000
+    start_timesteps: 5000
+    step_per_epoch: 1000
+    step_per_collect: 1
+    update_per_collect: 1
+  sac:
+    gamma: 0.99
+  actor_optimizer:
+    lr: 1e-3
+  checkpoint_path: null
+
+# Add everything here and then subtract using mode
+defaults:
+  - override /policy: sac

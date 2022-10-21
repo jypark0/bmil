@@ -1,0 +1,91 @@
+# @package _global_
+
+name: VINS_${env.agent}UMaze
+method: vins
+seed: 1
+
+logger:
+  wandb:
+    project: Maze
+    name: ${name}
+
+env:
+  agent: Ant
+  id: ${.agent}RegionUMaze-v0
+  init: &env_defaults {}
+  wrappers: []
+
+train:
+  n_envs: 1
+  buffer:
+    _target_: tianshou.data.ReplayBuffer
+    size: 1000000
+  env:
+    _target_: tianshou.env.DummyVectorEnv
+    norm_obs: false
+  collector:
+    _target_: src.data.collector.TqdmPosCollector
+
+test:
+  n_envs: 20
+  n_ep: 100
+  env:
+    _target_: tianshou.env.DummyVectorEnv
+    norm_obs: false
+  collector:
+    _target_: src.data.collector.TqdmPosCollector
+
+eval:
+  n_envs: 20
+  n_ep: 100
+  env:
+    _target_: tianshou.env.ShmemVectorEnv
+    norm_obs: ${test.env.norm_obs}
+  env_kwargs:
+    <<: *env_defaults
+    reset_noise_scale: 0.1
+  collector:
+    _target_: src.data.collector.TqdmPosCollector
+
+policy:
+  value_batch_size: 256
+  model_batch_size: 256
+  value_train:
+    n_epoch: 8000
+  model_train:
+    n_epoch: 1500
+  rl_train:
+    # Don't use VINS+RL
+    n_epoch: 0
+    step_per_epoch: 1000
+    step_per_collect: 1000
+  value_function:
+    gamma: 0.99
+    ns_coef: 10
+    perturb_coef:
+      pos: 0.3
+      full: 0.2
+  perturb:
+    _target_: src.policy.vins.MazePerturb
+    mode: "pos"
+  imitator:
+    vins_alpha: 0.05
+
+bc_policy:
+  batch_size: 256
+  train:
+    n_epoch: 400
+    step_per_epoch: 250
+  bc:
+    _target_: tianshou.policy.ImitationPolicy
+    action_scaling: False
+    action_bound_method: ""
+
+demonstration:
+  n_ep: 20
+  path: ${work_dir}/data/demos/maze/Goal${env.agent}RegionUMaze-v2/${.n_ep}episodes.pkl
+  repeat: 1
+
+defaults:
+  - /policy@bc_policy: bc
+  - override /policy: vins

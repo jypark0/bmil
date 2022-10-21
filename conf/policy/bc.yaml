@@ -1,0 +1,22 @@
+batch_size: 200
+
+train:
+  n_epoch: 1
+
+net:
+  _target_: tianshou.utils.net.common.Net
+  hidden_sizes: [256, 256, 256]
+  device: ${device}
+
+actor:
+  _target_: tianshou.utils.net.continuous.Actor
+  device: ${device}
+
+optimizer:
+  _target_: torch.optim.Adam
+  lr: 3e-4
+
+bc:
+  _target_: tianshou.policy.ImitationPolicy
+  action_scaling: True
+  action_bound_method: clip

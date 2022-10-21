@@ -1,0 +1,12 @@
+/notebooks
+/outputs
+/logs
+/videos
+/data
+/wandb
+/scratch
+run_parallel.sh
+*.out
+*.log
+*.pt
+*.png

@@ -1,0 +1,17 @@
+gym==0.21.0
+setuptools
+matplotlib
+torch==1.11.0
+--extra-index-url https://download.pytorch.org/whl/cu113
+jupyterlab
+wandb
+tianshou==0.4.7
+pillow
+moviepy
+torchinfo
+h5py
+ipdb
+hydra-core==1.1.1
+mujoco-py
+git+https://github.com/rail-berkeley/d4rl@d842aa1
+git+https://github.com/jypark0/mujoco-maze@416b9d9

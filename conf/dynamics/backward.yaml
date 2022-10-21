@@ -1,0 +1,31 @@
+mode: backward
+batch_size: ${policy.batch_size}
+
+act_net:
+  _target_: src.dynamics.backward.ProbabilisticNet
+  hidden_sizes: [256, 256, 256, 256]
+  device: ${device}
+
+obs_net:
+  _target_: src.dynamics.backward.ProbabilisticNet
+  hidden_sizes: [256, 256, 256, 256]
+  device: ${device}
+
+model:
+  _target_: src.dynamics.backward.BackwardModel
+  bounded_act: true
+  bounded_obs: true
+  update_method: converge
+  obs_delta: true
+  predict_reward: false
+  zero_reward: true
+  use_scaler: false
+  improvement_threshold: 1e-3
+  device: ${device}
+
+optimizer:
+  _target_: torch.optim.Adam
+  lr: 1e-3
+  weight_decay: 1e-5
+
+lr_decay: false

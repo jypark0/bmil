@@ -1,0 +1,54 @@
+# @package _global_
+
+name: BC_AdroitRelocate
+method: bc
+seed: 1
+
+logger:
+  wandb:
+    project: Adroit
+    name: ${name}
+
+env:
+  id: AdroitRelocate-v0
+  init: &env_defaults
+    terminate_on_success: true
+  wrappers: []
+
+test:
+  n_envs: 20
+  n_ep: 1000
+  env:
+    _target_: tianshou.env.DummyVectorEnv
+    norm_obs: false
+  collector:
+    _target_: src.data.collector.TqdmPosCollector
+
+eval:
+  n_envs: 20
+  n_ep: 1000
+  env:
+    _target_: tianshou.env.ShmemVectorEnv
+    norm_obs: ${test.env.norm_obs}
+  env_kwargs:
+    <<: *env_defaults
+    random_start: true
+  collector:
+    _target_: src.data.collector.TqdmPosCollector
+
+policy:
+  batch_size: 64
+  train:
+    n_epoch: 600
+    step_per_epoch: 50
+
+demonstration:
+  n_ep: 20
+  path: ${work_dir}/data/demos/adroit/AdroitRelocate-v0/${.n_ep}episodes.pkl
+  repeat: 1
+  buffer:
+    _target_: tianshou.data.ReplayBuffer
+    size: 1000000
+
+defaults:
+  - override /policy: bc
