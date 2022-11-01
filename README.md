@@ -9,7 +9,7 @@ If you find this work useful, please cite the paper as follows:
 @inproceedings{park2022bmil,
   title={Robust Imitation of a Few Demonstrations with a Backwards Model},
   author={Park, Jung Yeon and Wong, Lawson L.S.},
-  booktitle={Thirty-Sixth Conference on Neural Information Processing Systems (NeurIPS)},
+  booktitle={Advances in Neural Information Processing Systems (NeurIPS)},
   year={2022},
   url={https://arxiv.org/abs/2210.09337}
 }
