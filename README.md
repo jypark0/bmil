@@ -2,19 +2,6 @@
 
 This repository implements code for the paper [Robust Imitation of a Few Demonstrations with a Backwards Model](https://arxiv.org/abs/2210.09337).
 
-## Citation
-
-If you find this work useful, please cite the paper as follows:
-```
-@inproceedings{park2022bmil,
-  title={Robust Imitation of a Few Demonstrations with a Backwards Model},
-  author={Park, Jung Yeon and Wong, Lawson L.S.},
-  booktitle={Advances in Neural Information Processing Systems (NeurIPS)},
-  year={2022},
-  url={https://arxiv.org/abs/2210.09337}
-}
-```
-
 ## Requirements
 
 - Python 3.7+ (used 3.9)
@@ -105,3 +92,16 @@ A run script is provided in `scripts/adroit/run.sh`. Change the `METHOD` variabl
 
 <a id="2">[2]</a>
 [Learning Complex Dexterous Manipulation with Deep Reinforcement Learning and Demonstrations](https://arxiv.org/abs/1709.10087), Rajeswaran et al, 2018.
+
+## Citation
+
+If you find this work useful, please cite the paper as follows:
+```
+@inproceedings{park2022bmil,
+  title={Robust Imitation of a Few Demonstrations with a Backwards Model},
+  author={Park, Jung Yeon and Wong, Lawson L.S.},
+  booktitle={Advances in Neural Information Processing Systems (NeurIPS)},
+  year={2022},
+  url={https://arxiv.org/abs/2210.09337}
+}
+```
